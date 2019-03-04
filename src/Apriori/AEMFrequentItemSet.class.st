@@ -1,3 +1,30 @@
+"
+I'm the internal data structure used to represent the Apriori transaction database (list of occurrence of facts).
+I have a backpointer to the algorithm so that I can ask more information (for example when association rules are created).
+I have a support number (representing my occurence in the transactions).
+If my support is 3 it means that among the transactions at three contain my facts. 
+
+In this database
+(
+	#(A B D E)
+	#(B C D)
+	#(A B D E)
+	#(A C D E)
+	#(B C D E)
+	#(B D E)
+	#(C D)
+	#(A B C)
+	#(A D E)
+)
+
+#(B C D) support is 2.
+#(C D) support is 4.
+ 
+
+
+
+I'm responsible for the creation of association rules (more to come here)
+"
 Class {
 	#name : #AEMFrequentItemSet,
 	#superclass : #Object,
