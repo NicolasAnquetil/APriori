@@ -6,10 +6,10 @@ Class {
 		'items',
 		'apriori'
 	],
-	#category : #Apriori
+	#category : #'Apriori-Core'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'instance creation' }
 AEMFrequentItemSet class >> from: aCollection with: apriori [
 
 	^ self new
@@ -23,19 +23,16 @@ AEMFrequentItemSet >> apriori [
 ]
 
 { #category : #accessing }
-AEMFrequentItemSet >> apriori: anObject [
-	apriori := anObject
+AEMFrequentItemSet >> apriori: anAlgo [
+	apriori := anAlgo
 ]
 
 { #category : #accessing }
 AEMFrequentItemSet >> associationRuleFrom: from [
 
 	| to |
-
-	to := apriori frequenItemsetFor: (self items difference: from items) sorted.
-	
+	to := apriori frequentItemSetFor: (self items difference: from items) sorted.
 	(from notNil and: [to notNil ]) ifFalse: [ ^ nil ].
-
 	^ AEMAssociationRule new
 		from: from;
 		to: to;
@@ -50,7 +47,7 @@ AEMFrequentItemSet >> associationRules [
 
 { #category : #initialization }
 AEMFrequentItemSet >> initialize [
-
+	super initialize.
 	support := 0
 ]
 
@@ -66,14 +63,14 @@ AEMFrequentItemSet >> items: anObject [
 
 { #category : #printing }
 AEMFrequentItemSet >> printOn: aStream [
-
+	"aStream nextPutAll: 'Items: '."
 	self items printOn: aStream
 ]
 
 { #category : #accessing }
 AEMFrequentItemSet >> relativeSupport [
-
-	^ (self support / self transactions size) asTruncatedFloat100
+	self flag: #todo.
+	^ (self support / self transactions size) asScaledDecimal
 ]
 
 { #category : #accessing }

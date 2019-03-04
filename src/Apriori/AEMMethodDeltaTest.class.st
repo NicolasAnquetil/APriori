@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'mtd'
 	],
-	#category : #Apriori
+	#category : #'Apriori-APIEvolver'
 }
 
 { #category : #private }

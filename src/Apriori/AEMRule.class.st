@@ -1,7 +1,7 @@
 Class {
 	#name : #AEMRule,
 	#superclass : #AEMAssociationRule,
-	#category : #Apriori
+	#category : #'Apriori-Core'
 }
 
 { #category : #printing }

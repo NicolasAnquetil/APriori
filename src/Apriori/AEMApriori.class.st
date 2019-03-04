@@ -1,5 +1,37 @@
 "
-L = frequentItemSets
+I implement the Apriori learning algorithm https://en.wikipedia.org/wiki/Apriori_algorithm.
+I should get a list of transactions (basically arrays of elements) and a minimum number of occurrences that I should consider.
+Then I'm ready to run using the message run. 
+
+Here is an example how to create and run the algorithm. It shows the three main public messages to get done with me: transactions:, minSupport: and run.
+
+[[
+AEMApriori new
+		transactions: #(
+							#('1' '2' '5')
+							#('2' '4')
+							#('2' '3')
+							#('1' '2' '4')
+							#('1' '3')
+							#('2' '3')
+							#('1' '3')
+							#('1' '2' '3' '5')
+							#('1' '2' '3'));
+		minSupport: 2; ""2/9 = 22%""
+		run.
+]]]
+
+
+
+Implementation
+C is the threshold of the algorithm.
+Given a threshold C, the Apriori algorithm identifies the item sets which are subsets of at least C transactions (occurrences) in the database.
+
+L is the frequentItemSets
+
+I work with instance of the class FrequentItemSet.
+
+
 "
 Class {
 	#name : #AEMApriori,
@@ -11,8 +43,46 @@ Class {
 		'minSupport',
 		'frequentClass'
 	],
-	#category : #Apriori
+	#category : #'Apriori-Core'
 }
+
+{ #category : #example }
+AEMApriori class >> apriori1 [
+	<sampleInstance>
+	
+	^ AEMApriori new
+		transactions: #(
+							#('1' '2' '5')
+							#('2' '4')
+							#('2' '3')
+							#('1' '2' '4')
+							#('1' '3')
+							#('2' '3')
+							#('1' '3')
+							#('1' '2' '3' '5')
+							#('1' '2' '3'));
+		minSupport: 2; "2/9 = 22%"
+		run.
+]
+
+{ #category : #example }
+AEMApriori class >> apriori2 [
+	<sampleInstance>
+	
+	^ AEMApriori new
+		transactions: #(
+							#(A B D E)
+							#(B C D)
+							#(A B D E)
+							#(A C D E)
+							#(B C D E)
+							#(B D E)
+							#(C D)
+							#(A B C)
+							#(A D E));
+		minSupport: 3; 
+		run.
+]
 
 { #category : #accessing }
 AEMApriori >> C [
@@ -34,7 +104,7 @@ AEMApriori >> L: anObject [
 	L := anObject
 ]
 
-{ #category : #accessing }
+{ #category : #queries }
 AEMApriori >> candidates: k [
 	
 	| join |
@@ -49,16 +119,12 @@ AEMApriori >> candidates: k [
 	^ join collect: [ :each | self createItemSetFrom: each ].
 ]
 
-{ #category : #accessing }
+{ #category : #factory }
 AEMApriori >> createItemSetFrom: aCollection [
 
 	^ self frequentClass from: aCollection with: self
 
-	"^ AEMFrequentAssociation from: aCollection with: self"
-	
-	"^ AEMFrequentItemSet new
-		items: aCollection;
-		apriori: self"
+
 ]
 
 { #category : #running }
@@ -74,15 +140,9 @@ AEMApriori >> findItemSets1 [
 	C := self transactions flatCollectAsSet: #yourself.
 	C := C collect: [ :each | self createItemSetFrom: {each} ].
 	self transactions do: [ :transaction |
-		self incrementCForTransacation: transaction ].
+		self incrementCForTransaction: transaction ].
 
 	^ self filterC.
-]
-
-{ #category : #accessing }
-AEMApriori >> frequenItemsetFor: array [ 
-	
-	^ self frequentItemSets detect: [ :each | each items = array ] ifNone: [ #() ]
 ]
 
 { #category : #accessing }
@@ -95,26 +155,36 @@ AEMApriori >> frequentClass: anObject [
 	frequentClass := anObject
 ]
 
-{ #category : #accessing }
-AEMApriori >> frequentItemSets [
-
-	^ self L flatCollect: [ :each | each  ]
+{ #category : #queries }
+AEMApriori >> frequentItemSetFor: array [ 
+	
+	^ self frequentItemSets detect: [ :each | each items = array ] ifNone: [ #() ]
 ]
 
-{ #category : #accessing }
-AEMApriori >> frequentItemSetsWithSize: aSize [
+{ #category : #queries }
+AEMApriori >> frequentItemSets [
+	self flag: #todo. "frequentItemSets looks like returning all the potential frequentItemSets
+	without taking the threshold into account."
+	
+	^ L flatCollect: [ :each | each ]
+]
 
+{ #category : #queries }
+AEMApriori >> frequentItemSetsWithSize: aSize [
+	"Return the item sets of size, aSize"
+	
 	^ self frequentItemSets select: [ :each | each items size = aSize]
 ]
 
-{ #category : #accessing }
-AEMApriori >> frequentItemSetsWithSupport: support [
-
-	^ self frequentItemSets select: [ :each | each support = support ]
+{ #category : #queries }
+AEMApriori >> frequentItemSetsWithSupport: aNumber [
+	"Return the item sets of support, aNumber"
+	
+	^ self frequentItemSets select: [ :each | each support = aNumber ]
 ]
 
 { #category : #running }
-AEMApriori >> incrementCForTransacation: transaction [
+AEMApriori >> incrementCForTransaction: transaction [
 	self C
 		do: [ :each | 
 			(transaction includesAll: each items)
@@ -126,13 +196,14 @@ AEMApriori >> initialize [
 
 	C := OrderedCollection new.
 	L := OrderedCollection new.
+	minSupport := 2.
 	
 	"by default use AEMFrequentItemSet (#useFrequentItemSetClass), which is the classical frequent itemset for Apriori
 	The other possibility is to use the class AEMFrequentAssociation (#useFrequentAssociationClass), which is used in APIEvolMiner"
 	self useFrequentItemSetClass
 ]
 
-{ #category : #accessing }
+{ #category : #queries }
 AEMApriori >> itemsInFrequentItemSetsWithSize: aSize [
 
 	^ (self frequentItemSetsWithSize: aSize) collect: #items
@@ -140,10 +211,9 @@ AEMApriori >> itemsInFrequentItemSetsWithSize: aSize [
 
 { #category : #accessing }
 AEMApriori >> minSupport [
+	"Not really good design but we will see."
 	
-	"1 is different of 1.0"
-	
-	"absolute, ex 1, 23, 21.6"
+	"absolute, ex 1, 23"
 	(minSupport isInteger or: [ minSupport > 1 ])
 		ifTrue: [ ^ minSupport ].
 
@@ -151,33 +221,33 @@ AEMApriori >> minSupport [
 	^ minSupport * self transactions size
 ]
 
-{ #category : #accessing }
-AEMApriori >> minSupport: anObject [
-	minSupport := anObject
+{ #category : #'public API' }
+AEMApriori >> minSupport: aNumber [
+	"Pay attention aNumber can be an integer of a float. 
+	an Integer is meant for absolute values and a float between [ 0 and 1[ is for percentage.
+	Hence 1 is different of 1.0. Have a look at minSupport."
+	minSupport := aNumber
 ]
 
-{ #category : #running }
+{ #category : #'public API' }
 AEMApriori >> run [
-
 	"L = frequentItemSets"
-
 	| k |
-	
 	"L1 = {frequent items}"
-	k := 1.
+	k  := 1.
 	L add: self findItemSets1.
 
 	[ (L at: k) notEmpty ] whileTrue: [
 		"Ck+1 = candidates generated from Lk"
 		C := self candidates: (k + 1).
 		self transactions do: [ :transaction |
-			self incrementCForTransacation: transaction ].
+			self incrementCForTransaction: transaction ].
 		
 		L add: self filterC.
 		k := k + 1 ]
 ]
 
-{ #category : #accessing }
+{ #category : #queries }
 AEMApriori >> subsetsFor: frequentItemSet [ 
 	
 	^ self frequentItemSets select: [ :each | frequentItemSet items includesAll: each items ]
@@ -188,24 +258,22 @@ AEMApriori >> transactions [
 	^ transactions
 ]
 
-{ #category : #accessing }
+{ #category : #'public API' }
 AEMApriori >> transactions: anObject [
 	transactions := anObject
 ]
 
-{ #category : #accessing }
+{ #category : #customization }
 AEMApriori >> useFrequentAssociationClass [
-
-	"by default use AEMFrequentItemSet (#useFrequentItemSetClass), which is the classical frequent itemset for Apriori
+	"By default use AEMFrequentItemSet (#useFrequentItemSetClass), which is the classical frequent itemset for Apriori
 	The other possibility is to use the class AEMFrequentAssociation (#useFrequentAssociationClass), which is used in APIEvolMiner"
 
 	frequentClass := AEMFrequentAssociation
 ]
 
-{ #category : #accessing }
+{ #category : #customization }
 AEMApriori >> useFrequentItemSetClass [
-
-	"by default use AEMFrequentItemSet (#useFrequentItemSetClass), which is the classical frequent itemset for Apriori
+	"By default, use FrequentItemSet (#useFrequentItemSetClass), which is the classical frequent itemset for Apriori
 	The other possibility is to use the class AEMFrequentAssociation (#useFrequentAssociationClass), which is used in APIEvolMiner"
 
 	frequentClass := AEMFrequentItemSet

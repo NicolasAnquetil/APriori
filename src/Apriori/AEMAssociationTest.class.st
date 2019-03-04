@@ -1,7 +1,7 @@
 Class {
 	#name : #AEMAssociationTest,
 	#superclass : #TestCase,
-	#category : #Apriori
+	#category : #'Apriori-APIEvolver'
 }
 
 { #category : #tests }

@@ -6,7 +6,7 @@ Class {
 		'to',
 		'frequentItemSet'
 	],
-	#category : #Apriori
+	#category : #'Apriori-Core'
 }
 
 { #category : #comparing }
