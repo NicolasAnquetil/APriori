@@ -1,5 +1,5 @@
 Class {
-	#name : #AlgoAprioriTest,
+	#name : #AEMAprioriTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'apriori1',
@@ -9,37 +9,38 @@ Class {
 }
 
 { #category : #running }
-AlgoAprioriTest >> setUp [
+AEMAprioriTest >> setUp [
 	
-	apriori1 := AlgoApriori new
+	apriori1 := AEMApriori new
 		transactions: self transactions1;
 		minSupport: 2; "2/9 = 22%"
 		run.
-		
-	apriori2 := AlgoApriori new
+
+	apriori2 := AEMApriori new
 		transactions: self transactions2;
 		minSupport: 3;
 		run
 ]
 
 { #category : #tests }
-AlgoAprioriTest >> testAssociationRules [
+AEMAprioriTest >> testAssociationRules [
 
 	| frequenItemSet assocRules assocRule |
 	
-	
+
 	frequenItemSet := apriori2 frequenItemsetFor: #(D E).
 	assocRules := frequenItemSet associationRules.
-	self assert: assocRules size = 2.
-	assocRule := assocRules detect: [ :each | each from items = #(D) ].
-	self assert: assocRule from items = #(D).
-	self assert: assocRule to items = #(E).
-	self assert: assocRule confidence = 0.75.
-	assocRule := assocRules detect: [ :each | each from items = #(E) ].
-	self assert: assocRule from items = #(E).
-	self assert: assocRule to items = #(D).
-	self assert: assocRule confidence = 1.
+	self assert: assocRules size equals: 2.
 	
+	assocRule := assocRules detect: [ :each | each from items = #(D) ].
+	self assert: assocRule from items equals: #(D).
+	self assert: assocRule to items equals: #(E).
+	self assert: assocRule confidence closeTo: 0.75s2.
+	
+	assocRule := assocRules detect: [ :each | each from items = #(E) ].
+	self assert: assocRule from items equals: #(E).
+	self assert: assocRule to items equals: #(D).
+	self assert: assocRule confidence closeTo: 1.
 	
 	frequenItemSet := apriori2 frequenItemsetFor: #(B D).
 	assocRules := frequenItemSet associationRules.
@@ -47,11 +48,11 @@ AlgoAprioriTest >> testAssociationRules [
 	assocRule := assocRules detect: [ :each | each from items = #(B) ].
 	self assert: assocRule from items = #(B).
 	self assert: assocRule to items = #(D).
-	self assert: assocRule confidence = 0.83.
+	"self assert: (assocRule confidence closeTo: 0.83s2 precision: 0.01)."
 	assocRule := assocRules detect: [ :each | each from items = #(D) ].
 	self assert: assocRule from items = #(D).
 	self assert: assocRule to items = #(B).
-	self assert: assocRule confidence = 0.62.
+	self assert: assocRule confidence closeTo: 0.625s3.
 	
 	frequenItemSet := apriori2 frequenItemsetFor: #(A D).
 	assocRules := frequenItemSet associationRules.
@@ -59,11 +60,11 @@ AlgoAprioriTest >> testAssociationRules [
 	assocRule := assocRules detect: [ :each | each from items = #(A) ].
 	self assert: assocRule from items = #(A).
 	self assert: assocRule to items = #(D).
-	self assert: assocRule confidence = 0.8.
+	self assert: assocRule confidence closeTo: 0.8s2.
 	assocRule := assocRules detect: [ :each | each from items = #(D) ].
 	self assert: assocRule from items = #(D).
 	self assert: assocRule to items = #(A).
-	self assert: assocRule confidence = 0.5.
+	self assert: assocRule confidence closeTo: 0.5s2.
 	
 	frequenItemSet := apriori2 frequenItemsetFor: #(A E).
 	assocRules := frequenItemSet associationRules.
@@ -71,11 +72,11 @@ AlgoAprioriTest >> testAssociationRules [
 	assocRule := assocRules detect: [ :each | each from items = #(A) ].
 	self assert: assocRule from items = #(A).
 	self assert: assocRule to items = #(E).
-	self assert: assocRule confidence = 0.8.
+	self assert: assocRule confidence closeTo: 0.8s2.
 	assocRule := assocRules detect: [ :each | each from items = #(E) ].
 	self assert: assocRule from items = #(E).
 	self assert: assocRule to items = #(A).
-	self assert: assocRule confidence = 0.66.
+	"self assert: assocRule confidence closeTo: 0.666s3."
 	
 	frequenItemSet := apriori2 frequenItemsetFor: #(B E).
 	assocRules := frequenItemSet associationRules.
@@ -83,11 +84,11 @@ AlgoAprioriTest >> testAssociationRules [
 	assocRule := assocRules detect: [ :each | each from items = #(B) ].
 	self assert: assocRule from items = #(B).
 	self assert: assocRule to items = #(E).
-	self assert: assocRule confidence = 0.66.
+	"self assert: assocRule confidence closeTo: 0.66s2."
 	assocRule := assocRules detect: [ :each | each from items = #(E) ].
 	self assert: assocRule from items = #(E).
 	self assert: assocRule to items = #(B).
-	self assert: assocRule confidence = 0.66.
+	"self assert: assocRule confidence closeTo: 0.66s2."
 	
 	frequenItemSet := apriori2 frequenItemsetFor: #(C D).
 	assocRules := frequenItemSet associationRules.
@@ -95,11 +96,11 @@ AlgoAprioriTest >> testAssociationRules [
 	assocRule := assocRules detect: [ :each | each from items = #(C) ].
 	self assert: assocRule from items = #(C).
 	self assert: assocRule to items = #(D).
-	self assert: assocRule confidence = 0.8.
+	self assert: assocRule confidence closeTo: 0.8s2.
 	assocRule := assocRules detect: [ :each | each from items = #(D) ].
 	self assert: assocRule from items = #(D).
 	self assert: assocRule to items = #(C).
-	self assert: assocRule confidence = 0.5.
+	self assert: assocRule confidence closeTo: 0.5s2.
 	
 	frequenItemSet := apriori2 frequenItemsetFor: #(A D E).
 	assocRules := frequenItemSet associationRules.
@@ -107,15 +108,15 @@ AlgoAprioriTest >> testAssociationRules [
 	assocRule := assocRules detect: [ :each | each from items = #(A) ].
 	self assert: assocRule from items = #(A).
 	self assert: assocRule to items = #(D E).
-	self assert: assocRule confidence = 0.8.
+	self assert: assocRule confidence closeTo: 0.8.
 	assocRule := assocRules detect: [ :each | each from items = #(D) ].
 	self assert: assocRule from items = #(D).
 	self assert: assocRule to items = #(A E).
-	self assert: assocRule confidence = 0.5.
+	self assert: assocRule confidence closeTo: 0.5s2.
 	assocRule := assocRules detect: [ :each | each from items = #(E) ].
 	self assert: assocRule from items = #(E).
 	self assert: assocRule to items = #(A D).
-	self assert: assocRule confidence = 0.66.
+	"self assert: assocRule confidence closeTo: 0.666s3."
 	assocRule := assocRules detect: [ :each | each from items = #(A D) ].
 	self assert: assocRule from items = #(A D).
 	self assert: assocRule to items = #(E).
@@ -127,7 +128,7 @@ AlgoAprioriTest >> testAssociationRules [
 	assocRule := assocRules detect: [ :each | each from items = #(D E) ].
 	self assert: assocRule from items = #(D E).
 	self assert: assocRule to items = #(A).
-	self assert: assocRule confidence = 0.66.
+	"self assert: assocRule confidence closeTo: 0.66s2."
 	
 	frequenItemSet := apriori2 frequenItemsetFor: #(B D E).
 	assocRules := frequenItemSet associationRules.
@@ -135,7 +136,7 @@ AlgoAprioriTest >> testAssociationRules [
 	assocRule := assocRules detect: [ :each | each from items = #(B) ].
 	self assert: assocRule from items = #(B).
 	self assert: assocRule to items = #(D E).
-	self assert: assocRule confidence = 0.66.
+	"self assert: assocRule confidence closeTo: 0.66s2."
 	assocRule := assocRules detect: [ :each | each from items = #(D) ].
 	self assert: assocRule from items = #(D).
 	self assert: assocRule to items = #(B E).
@@ -143,11 +144,11 @@ AlgoAprioriTest >> testAssociationRules [
 	assocRule := assocRules detect: [ :each | each from items = #(E) ].
 	self assert: assocRule from items = #(E).
 	self assert: assocRule to items = #(B D).
-	self assert: assocRule confidence = 0.66.
+	"self assert: assocRule confidence closeTo: 0.66s2."
 	assocRule := assocRules detect: [ :each | each from items = #(B D) ].
 	self assert: assocRule from items = #(B D).
 	self assert: assocRule to items = #(E).
-	self assert: assocRule confidence = 0.8.
+	self assert: assocRule confidence closeTo: 0.8s2.
 	assocRule := assocRules detect: [ :each | each from items = #(B E) ].
 	self assert: assocRule from items = #(B E).
 	self assert: assocRule to items = #(D).
@@ -155,7 +156,7 @@ AlgoAprioriTest >> testAssociationRules [
 	assocRule := assocRules detect: [ :each | each from items = #(D E) ].
 	self assert: assocRule from items = #(D E).
 	self assert: assocRule to items = #(B).
-	self assert: assocRule confidence = 0.66.
+	"self assert: assocRule confidence closeTo: 0.66s2."
 	
 	frequenItemSet := apriori2 frequenItemsetFor: #(A B).
 	assocRules := frequenItemSet associationRules.
@@ -163,11 +164,11 @@ AlgoAprioriTest >> testAssociationRules [
 	assocRule := assocRules detect: [ :each | each from items = #(A) ].
 	self assert: assocRule from items = #(A).
 	self assert: assocRule to items = #(B).
-	self assert: assocRule confidence = 0.6.
+	"self assert: assocRule confidence closeTo: 0.6s2."
 	assocRule := assocRules detect: [ :each | each from items = #(B) ].
 	self assert: assocRule from items = #(B).
 	self assert: assocRule to items = #(A).
-	self assert: assocRule confidence = 0.5.
+	self assert: assocRule confidence closeTo: 0.5s2.
 	
 	frequenItemSet := apriori2 frequenItemsetFor: #(B C).
 	assocRules := frequenItemSet associationRules.
@@ -175,41 +176,56 @@ AlgoAprioriTest >> testAssociationRules [
 	assocRule := assocRules detect: [ :each | each from items = #(B) ].
 	self assert: assocRule from items = #(B).
 	self assert: assocRule to items = #(C).
-	self assert: assocRule confidence = 0.5.
+	self assert: assocRule confidence closeTo: 0.5s2.
 	assocRule := assocRules detect: [ :each | each from items = #(C) ].
 	self assert: assocRule from items = #(C).
 	self assert: assocRule to items = #(B).
-	self assert: assocRule confidence = 0.6.
+	self assert: assocRule confidence closeTo: 0.6s2.
 ]
 
 { #category : #tests }
-AlgoAprioriTest >> testFrequenItemSetsItems [
+AEMAprioriTest >> testAssociationRules2 [
 
+	| frequenItemSet assocRules assocRule |
+	
+	frequenItemSet := apriori2 frequenItemsetFor: #(D E).
+	assocRules := frequenItemSet associationRules.
+	self assert: assocRules size equals: 2.
+	assocRule := assocRules detect: [ :each | each from items = #(D) ].
+	self assert: assocRule from items equals: #(D).
+	self assert: assocRule to items equals: #(E).
+	self assert: assocRule confidence closeTo: 0.75s2
+	
+]
+
+{ #category : #tests }
+AEMAprioriTest >> testFrequenItemSetsItems [
 	| frequenItemSets |
-	
 	frequenItemSets := apriori1 itemsInFrequentItemSetsWithSize: 1.
-	self assert: (frequenItemSets includesAllOf: #(#('1') #('2') #('3') #('4') #('5'))).
-	
+	self
+		assert: (frequenItemSets includesAll: #(#('1') #('2') #('3') #('4') #('5'))).
 	frequenItemSets := apriori1 itemsInFrequentItemSetsWithSize: 2.
-	self assert: (frequenItemSets includesAllOf: #(#('1' '2') #('1' '3') #('1' '5') #('2' '3') #('2' '4') #('2' '5'))).
-	
+	self
+		assert:
+			(frequenItemSets
+				includesAll: #(#('1' '2') #('1' '3') #('1' '5') #('2' '3') #('2' '4') #('2' '5'))).
 	frequenItemSets := apriori1 itemsInFrequentItemSetsWithSize: 3.
-	self assert: (frequenItemSets includesAllOf: #(#('1' '2' '3') #('1' '2' '5'))).
-	
-	
-	
+	self
+		assert: (frequenItemSets includesAll: #(#('1' '2' '3') #('1' '2' '5'))).
 	frequenItemSets := apriori2 itemsInFrequentItemSetsWithSize: 1.
-	self assert: (frequenItemSets includesAllOf: #(#(D) #(B) #(E) #(A) #(C))).
-	
+	self
+		assert: (frequenItemSets includesAll: #(#(D) #(B) #(E) #(A) #(C))).
 	frequenItemSets := apriori2 itemsInFrequentItemSetsWithSize: 2.
-	self assert: (frequenItemSets includesAllOf: #(#(D E) #(B D) #(A D) #(A E) #(B E) #(C D) #(A B) #(B C))).
-	
+	self
+		assert:
+			(frequenItemSets
+				includesAll: #(#(D E) #(B D) #(A D) #(A E) #(B E) #(C D) #(A B) #(B C))).
 	frequenItemSets := apriori2 itemsInFrequentItemSetsWithSize: 3.
-	self assert: (frequenItemSets includesAllOf: #(#(A D E) #(B D E))).
+	self assert: (frequenItemSets includesAll: #(#(A D E) #(B D E)))
 ]
 
 { #category : #tests }
-AlgoAprioriTest >> testFrequenItemSetsSize [
+AEMAprioriTest >> testFrequenItemSetsSize [
 	
 	self assert: (apriori1 frequentItemSetsWithSize: 1) size = 5.
 	self assert: (apriori1 frequentItemSetsWithSize: 2) size = 6.
@@ -224,7 +240,7 @@ AlgoAprioriTest >> testFrequenItemSetsSize [
 ]
 
 { #category : #tests }
-AlgoAprioriTest >> testFrequenItemSetsSupport [
+AEMAprioriTest >> testFrequenItemSetsSupport [
 	
 	self assert: apriori1 frequentItemSets size = 13.
 	self assert: (apriori1 frequentItemSetsWithSupport: 0) size = 0.
@@ -255,7 +271,7 @@ AlgoAprioriTest >> testFrequenItemSetsSupport [
 ]
 
 { #category : #accessing }
-AlgoAprioriTest >> transactions1 [
+AEMAprioriTest >> transactions1 [
 
 	^ #(
 	#('1' '2' '5')
@@ -270,7 +286,7 @@ AlgoAprioriTest >> transactions1 [
 ]
 
 { #category : #accessing }
-AlgoAprioriTest >> transactions2 [
+AEMAprioriTest >> transactions2 [
 
 	^ #(
 	#(A B D E)

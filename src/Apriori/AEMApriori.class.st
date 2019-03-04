@@ -2,7 +2,7 @@
 L = frequentItemSets
 "
 Class {
-	#name : #AlgoApriori,
+	#name : #AEMApriori,
 	#superclass : #Object,
 	#instVars : [
 		'transactions',
@@ -15,27 +15,27 @@ Class {
 }
 
 { #category : #accessing }
-AlgoApriori >> C [
+AEMApriori >> C [
 	^ C
 ]
 
 { #category : #accessing }
-AlgoApriori >> C: anObject [
+AEMApriori >> C: anObject [
 	C := anObject
 ]
 
 { #category : #accessing }
-AlgoApriori >> L [
+AEMApriori >> L [
 	^ L
 ]
 
 { #category : #accessing }
-AlgoApriori >> L: anObject [
+AEMApriori >> L: anObject [
 	L := anObject
 ]
 
 { #category : #accessing }
-AlgoApriori >> candidates: k [
+AEMApriori >> candidates: k [
 	
 	| join |
 	
@@ -50,7 +50,7 @@ AlgoApriori >> candidates: k [
 ]
 
 { #category : #accessing }
-AlgoApriori >> createItemSetFrom: aCollection [
+AEMApriori >> createItemSetFrom: aCollection [
 
 	^ self frequentClass from: aCollection with: self
 
@@ -62,14 +62,14 @@ AlgoApriori >> createItemSetFrom: aCollection [
 ]
 
 { #category : #running }
-AlgoApriori >> filterC [
+AEMApriori >> filterC [
 
 	^ self C select: [ :each |
 		each support >= self minSupport ]
 ]
 
 { #category : #running }
-AlgoApriori >> findItemSets1 [
+AEMApriori >> findItemSets1 [
 
 	C := self transactions flatCollectAsSet: #yourself.
 	C := C collect: [ :each | self createItemSetFrom: {each} ].
@@ -80,49 +80,49 @@ AlgoApriori >> findItemSets1 [
 ]
 
 { #category : #accessing }
-AlgoApriori >> frequenItemsetFor: array [ 
+AEMApriori >> frequenItemsetFor: array [ 
 	
 	^ self frequentItemSets detect: [ :each | each items = array ] ifNone: [ #() ]
 ]
 
 { #category : #accessing }
-AlgoApriori >> frequentClass [
+AEMApriori >> frequentClass [
 	^ frequentClass
 ]
 
 { #category : #accessing }
-AlgoApriori >> frequentClass: anObject [
+AEMApriori >> frequentClass: anObject [
 	frequentClass := anObject
 ]
 
 { #category : #accessing }
-AlgoApriori >> frequentItemSets [
+AEMApriori >> frequentItemSets [
 
 	^ self L flatten
 ]
 
 { #category : #accessing }
-AlgoApriori >> frequentItemSetsWithSize: aSize [
+AEMApriori >> frequentItemSetsWithSize: aSize [
 
 	^ self frequentItemSets select: [ :each | each items size = aSize]
 ]
 
 { #category : #accessing }
-AlgoApriori >> frequentItemSetsWithSupport: support [
+AEMApriori >> frequentItemSetsWithSupport: support [
 
 	^ self frequentItemSets select: [ :each | each support = support ]
 ]
 
 { #category : #running }
-AlgoApriori >> incrementCForTransacation: transaction [
-
-	self C do: [ :each |
-		(transaction includesAllOf: each items )
-			ifTrue: [ each support: (each support + 1) ]]
+AEMApriori >> incrementCForTransacation: transaction [
+	self C
+		do: [ :each | 
+			(transaction includesAll: each items)
+				ifTrue: [ each support: each support + 1 ] ]
 ]
 
 { #category : #initialization }
-AlgoApriori >> initialize [ 
+AEMApriori >> initialize [ 
 
 	C := OrderedCollection new.
 	L := OrderedCollection new.
@@ -133,13 +133,13 @@ AlgoApriori >> initialize [
 ]
 
 { #category : #accessing }
-AlgoApriori >> itemsInFrequentItemSetsWithSize: aSize [
+AEMApriori >> itemsInFrequentItemSetsWithSize: aSize [
 
 	^ (self frequentItemSetsWithSize: aSize) collect: #items
 ]
 
 { #category : #accessing }
-AlgoApriori >> minSupport [
+AEMApriori >> minSupport [
 	
 	"1 is different of 1.0"
 	
@@ -152,12 +152,12 @@ AlgoApriori >> minSupport [
 ]
 
 { #category : #accessing }
-AlgoApriori >> minSupport: anObject [
+AEMApriori >> minSupport: anObject [
 	minSupport := anObject
 ]
 
 { #category : #running }
-AlgoApriori >> run [
+AEMApriori >> run [
 
 	"L = frequentItemSets"
 
@@ -178,23 +178,23 @@ AlgoApriori >> run [
 ]
 
 { #category : #accessing }
-AlgoApriori >> subsetsFor: frequentItemSet [ 
+AEMApriori >> subsetsFor: frequentItemSet [ 
 	
 	^ self frequentItemSets select: [ :each | frequentItemSet items includesAll: each items ]
 ]
 
 { #category : #accessing }
-AlgoApriori >> transactions [
+AEMApriori >> transactions [
 	^ transactions
 ]
 
 { #category : #accessing }
-AlgoApriori >> transactions: anObject [
+AEMApriori >> transactions: anObject [
 	transactions := anObject
 ]
 
 { #category : #accessing }
-AlgoApriori >> useFrequentAssociationClass [
+AEMApriori >> useFrequentAssociationClass [
 
 	"by default use AEMFrequentItemSet (#useFrequentItemSetClass), which is the classical frequent itemset for Apriori
 	The other possibility is to use the class AEMFrequentAssociation (#useFrequentAssociationClass), which is used in APIEvolMiner"
@@ -203,7 +203,7 @@ AlgoApriori >> useFrequentAssociationClass [
 ]
 
 { #category : #accessing }
-AlgoApriori >> useFrequentItemSetClass [
+AEMApriori >> useFrequentItemSetClass [
 
 	"by default use AEMFrequentItemSet (#useFrequentItemSetClass), which is the classical frequent itemset for Apriori
 	The other possibility is to use the class AEMFrequentAssociation (#useFrequentAssociationClass), which is used in APIEvolMiner"
