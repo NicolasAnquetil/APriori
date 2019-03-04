@@ -24,8 +24,9 @@ AEMApriori new
 
 
 Implementation
-C is the threshold of the algorithm.
-Given a threshold C, the Apriori algorithm identifies the item sets which are subsets of at least C transactions (occurrences) in the database.
+
+Given a threshold minSupport, the Apriori algorithm identifies the item sets which are subsets of at least minSupport transactions (occurrences) in the database.
+
 
 L is the frequentItemSets
 
