@@ -34,18 +34,6 @@ AEMAssociationRule >> associationsAsString [
 ]
 
 { #category : #accessing }
-AEMAssociationRule >> classes [
-
-	^ self deltaMethods collectAsSet: #className
-]
-
-{ #category : #accessing }
-AEMAssociationRule >> commiters [
-
-	^ self deltaMethods collectAsSet: #author
-]
-
-{ #category : #accessing }
 AEMAssociationRule >> confidence [
 	
 	"
@@ -58,25 +46,6 @@ AEMAssociationRule >> confidence [
 	"
 	
 	^ (self frequentItemSet support / self from support) asScaledDecimal 
-]
-
-{ #category : #accessing }
-AEMAssociationRule >> dates [
-
-	^ (self timestamps collectAsSet: #asDate) sorted
-]
-
-{ #category : #accessing }
-AEMAssociationRule >> deltaMethods [
-
-	^ (self systemHistory queryAssociations: self associationsAsQuery) methods sorted: [ :a :b | a timestamp < b timestamp ]
-]
-
-{ #category : #accessing }
-AEMAssociationRule >> deltaMethodsForQuery [
-
-	"find just the delta methods in my query"
-	^ (self queryResult queryAssociations: self associationsAsQuery) methods sorted: [ :a :b | a timestamp < b timestamp ]
 ]
 
 { #category : #accessing }
@@ -111,19 +80,6 @@ AEMAssociationRule >> hash [
 	^ self from hash + self to hash
 ]
 
-{ #category : #validation }
-AEMAssociationRule >> match: aDeltaMethod [ 
-	
-	^ (self from matchDeletedAssociations: aDeltaMethod deletedAssociationsAsQueryForValidation) and: [
-		self to matchAddedAssociations: aDeltaMethod addedAssociationsAsQueryForValidation]
-]
-
-{ #category : #experiments }
-AEMAssociationRule >> overview [
-
-	^ { self deltaMethods size. self revisions size. self dates size. self timeframeInDays}
-]
-
 { #category : #printing }
 AEMAssociationRule >> printOn: aStream [
 	
@@ -144,14 +100,6 @@ AEMAssociationRule >> relativeSupport [
 ]
 
 { #category : #accessing }
-AEMAssociationRule >> revisions [
-
-	"consider a windows of 5 minutes"
-
-	^ AEMUtils revisionsFor: self timestamps
-]
-
-{ #category : #accessing }
 AEMAssociationRule >> size [
 
 	^ self frequentItemSet size	
@@ -161,37 +109,6 @@ AEMAssociationRule >> size [
 AEMAssociationRule >> support [
 
 	^ self frequentItemSet support
-]
-
-{ #category : #accessing }
-AEMAssociationRule >> systemHistory [
-
-	^ self frequentItemSet systemHistory
-]
-
-{ #category : #accessing }
-AEMAssociationRule >> timeframe [
-	
-	| dates firstFix lastFix |
-	
-	dates := self dates.
-	firstFix := dates first.
-	lastFix := dates last.
-	^ lastFix - firstFix
-]
-
-{ #category : #accessing }
-AEMAssociationRule >> timeframeInDays [
-	
-	^ self timeframe days
-]
-
-{ #category : #accessing }
-AEMAssociationRule >> timestamps [
-
-	"consider a windows of 5 minutes"
-
-	^ self deltaMethods collect: #timestamp
 ]
 
 { #category : #accessing }

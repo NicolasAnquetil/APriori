@@ -75,9 +75,8 @@ AEMFrequentItemSet >> relativeSupport [
 
 { #category : #accessing }
 AEMFrequentItemSet >> subsets [
-	
+	"Returns the subsets for the receiver."
 	"remove itemsets with size equals to me and to 1"
-	
 	^ (self apriori subsetsFor: self) reject: [ :each | (each items size = self items size)]
 ]
 

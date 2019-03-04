@@ -187,7 +187,6 @@ AEMAprioriTest >> testAssociationRules [
 AEMAprioriTest >> testAssociationRules2 [
 
 	| frequenItemSet assocRules assocRule |
-	self halt.
 	frequenItemSet := apriori2 frequentItemSetFor: #(D E).
 	assocRules := frequenItemSet associationRules.
 	self assert: assocRules size equals: 2.

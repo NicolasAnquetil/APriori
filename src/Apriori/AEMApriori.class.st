@@ -39,10 +39,10 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'transactions',
-		'C',
 		'L',
 		'minSupport',
-		'frequentClass'
+		'frequentClass',
+		'candidates'
 	],
 	#category : #'Apriori-Core'
 }
@@ -85,35 +85,14 @@ AEMApriori class >> apriori2 [
 		run.
 ]
 
-{ #category : #accessing }
-AEMApriori >> C [
-	^ C
-]
-
-{ #category : #accessing }
-AEMApriori >> C: anObject [
-	C := anObject
-]
-
-{ #category : #accessing }
-AEMApriori >> L [
-	^ L
-]
-
-{ #category : #accessing }
-AEMApriori >> L: anObject [
-	L := anObject
-]
-
 { #category : #queries }
 AEMApriori >> candidates: k [
 	
 	| join |
-	
-	join := self L last asSet asArray.
+	join := L last asSet asArray.
 
 	join := join collectWithIndex: [ :each :index | 
-		((index+1) to: join size) collect: [ :index2 | 
+		((index + 1) to: join size) collect: [ :index2 | 
 			((join at: index) items union: (join at: index2) items) sorted ]].
 	
 	join := (join flatCollect: [ :each | each ]) asSet select: [ :each | each asSet size = k ].
@@ -129,21 +108,12 @@ AEMApriori >> createItemSetFrom: aCollection [
 ]
 
 { #category : #running }
-AEMApriori >> filterC [
-
-	^ self C select: [ :each |
-		each support >= self minSupport ]
-]
-
-{ #category : #running }
 AEMApriori >> findItemSets1 [
-
-	C := self transactions flatCollectAsSet: #yourself.
-	C := C collect: [ :each | self createItemSetFrom: {each} ].
-	self transactions do: [ :transaction |
-		self incrementCForTransaction: transaction ].
-
-	^ self filterC.
+	candidates := self transactions flatCollectAsSet: #yourself.
+	candidates := candidates collect: [ :each | self createItemSetFrom: {each} ].
+	self transactions
+		do: [ :transaction | self incrementSupportOfCandidatesForTransaction: transaction ].
+	^ self selectCandidatesAboveMinSupport
 ]
 
 { #category : #accessing }
@@ -158,7 +128,7 @@ AEMApriori >> frequentClass: anObject [
 
 { #category : #queries }
 AEMApriori >> frequentItemSetFor: array [ 
-	
+	self flag: #todo. "It looks like the order is really important. We should check that this is true"
 	^ self frequentItemSets detect: [ :each | each items = array ] ifNone: [ #() ]
 ]
 
@@ -185,17 +155,19 @@ AEMApriori >> frequentItemSetsWithSupport: aNumber [
 ]
 
 { #category : #running }
-AEMApriori >> incrementCForTransaction: transaction [
-	self C
-		do: [ :each | 
-			(transaction includesAll: each items)
-				ifTrue: [ each support: each support + 1 ] ]
+AEMApriori >> incrementSupportOfCandidatesForTransaction: transaction [
+	"Increment the support of all the candidates based on the given transaction"
+	
+	candidates
+		do: [ :candidate | 
+			(transaction includesAll: candidate items)
+				ifTrue: [ candidate support: candidate support + 1 ] ]
 ]
 
 { #category : #initialization }
 AEMApriori >> initialize [ 
 
-	C := OrderedCollection new.
+	candidates := OrderedCollection new.
 	L := OrderedCollection new.
 	minSupport := 2.
 	
@@ -240,16 +212,23 @@ AEMApriori >> run [
 
 	[ (L at: k) notEmpty ] whileTrue: [
 		"Ck+1 = candidates generated from Lk"
-		C := self candidates: (k + 1).
+		candidates := self candidates: (k + 1).
 		self transactions do: [ :transaction |
-			self incrementCForTransaction: transaction ].
+			self incrementSupportOfCandidatesForTransaction: transaction ].
 		
-		L add: self filterC.
+		L add: self selectCandidatesAboveMinSupport.
 		k := k + 1 ]
 ]
 
+{ #category : #running }
+AEMApriori >> selectCandidatesAboveMinSupport [
+
+	^ candidates select: [ :each | each support >= self minSupport ]
+]
+
 { #category : #queries }
-AEMApriori >> subsetsFor: frequentItemSet [ 
+AEMApriori >> subsetsFor: frequentItemSet [
+	"Returns the subsets containing the elements of frequentItemSet"
 	
 	^ self frequentItemSets select: [ :each | frequentItemSet items includesAll: each items ]
 ]
