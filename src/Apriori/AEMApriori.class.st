@@ -45,7 +45,7 @@ AEMApriori >> candidates: k [
 		((index+1) to: join size) collect: [ :index2 | 
 			((join at: index) items union: (join at: index2) items) sorted ]].
 	
-	join := join flatten asSet select: [ :each | each asSet size = k ].
+	join := (join flatCollect: [ :each | each ]) asSet select: [ :each | each asSet size = k ].
 	^ join collect: [ :each | self createItemSetFrom: each ].
 ]
 
@@ -98,7 +98,7 @@ AEMApriori >> frequentClass: anObject [
 { #category : #accessing }
 AEMApriori >> frequentItemSets [
 
-	^ self L flatten
+	^ self L flatCollect: [ :each | each  ]
 ]
 
 { #category : #accessing }
