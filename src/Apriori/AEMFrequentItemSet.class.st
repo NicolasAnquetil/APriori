@@ -90,7 +90,7 @@ AEMFrequentItemSet >> items: anObject [
 
 { #category : #printing }
 AEMFrequentItemSet >> printOn: aStream [
-	"aStream nextPutAll: 'Items: '."
+	aStream nextPutAll: 'ItemSet: '.
 	self items printOn: aStream
 ]
 

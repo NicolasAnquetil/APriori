@@ -83,8 +83,11 @@ AEMAssociationRule >> hash [
 { #category : #printing }
 AEMAssociationRule >> printOn: aStream [
 	
+	aStream nextPutAll: 'AssociationRule: '.
 	self from printOn: aStream.
-	self to printOn: aStream
+	self to printOn: aStream.
+
+	
 ]
 
 { #category : #accessing }
