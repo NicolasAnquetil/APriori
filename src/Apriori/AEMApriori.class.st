@@ -44,7 +44,7 @@ Class {
 		'frequentClass',
 		'candidates'
 	],
-	#category : #'Apriori-Core'
+	#category : #'APriori-Core'
 }
 
 { #category : #example }

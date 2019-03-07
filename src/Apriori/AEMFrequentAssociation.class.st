@@ -7,7 +7,7 @@ Class {
 		'items',
 		'apriori'
 	],
-	#category : #'Apriori-APIEvolver'
+	#category : #'APriori-APIEvolver'
 }
 
 { #category : #'instance creation' }

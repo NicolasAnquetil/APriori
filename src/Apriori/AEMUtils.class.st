@@ -1,7 +1,7 @@
 Class {
 	#name : #AEMUtils,
 	#superclass : #Object,
-	#category : #'Apriori-Core'
+	#category : #'APriori-Core'
 }
 
 { #category : #'exporting-elements' }

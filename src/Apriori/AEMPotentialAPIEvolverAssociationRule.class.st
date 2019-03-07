@@ -1,7 +1,7 @@
 Class {
 	#name : #AEMPotentialAPIEvolverAssociationRule,
 	#superclass : #AEMAssociationRule,
-	#category : #'Apriori-APIEvolver'
+	#category : #'APriori-APIEvolver'
 }
 
 { #category : #accessing }

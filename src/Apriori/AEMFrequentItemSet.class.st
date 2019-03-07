@@ -33,7 +33,7 @@ Class {
 		'items',
 		'apriori'
 	],
-	#category : #'Apriori-Core'
+	#category : #'APriori-Core'
 }
 
 { #category : #'instance creation' }

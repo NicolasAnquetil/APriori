@@ -5,7 +5,7 @@ Class {
 		'apriori1',
 		'apriori2'
 	],
-	#category : #'Apriori-Core'
+	#category : #'APriori-Core'
 }
 
 { #category : #running }

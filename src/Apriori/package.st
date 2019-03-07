@@ -1,1 +1,1 @@
-Package { #name : #Apriori }
+Package { #name : #APriori }

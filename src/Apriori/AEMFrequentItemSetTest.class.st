@@ -1,7 +1,7 @@
 Class {
 	#name : #AEMFrequentItemSetTest,
 	#superclass : #TestCase,
-	#category : #'Apriori-Core'
+	#category : #'APriori-Core'
 }
 
 { #category : #tests }
