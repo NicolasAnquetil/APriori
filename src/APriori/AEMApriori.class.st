@@ -41,8 +41,7 @@ Class {
 		'transactions',
 		'L',
 		'minSupport',
-		'frequentClass',
-		'candidates'
+		'frequentClass'
 	],
 	#category : #'APriori-Core'
 }
@@ -109,11 +108,12 @@ AEMApriori >> createItemSetFrom: aCollection [
 
 { #category : #running }
 AEMApriori >> findItemSets1 [
+	| candidates |
 	candidates := self transactions flatCollectAsSet: #yourself.
 	candidates := candidates collect: [ :each | self createItemSetFrom: {each} ].
 	self transactions
-		do: [ :transaction | self incrementSupportOfCandidatesForTransaction: transaction ].
-	^ self selectCandidatesAboveMinSupport
+		do: [ :transaction | self incrementSupportOfCandidates: candidates forTransaction: transaction ].
+	^ candidates := self selectCandidatesAboveMinSupport: candidates
 ]
 
 { #category : #accessing }
@@ -155,9 +155,8 @@ AEMApriori >> frequentItemSetsWithSupport: aNumber [
 ]
 
 { #category : #running }
-AEMApriori >> incrementSupportOfCandidatesForTransaction: transaction [
+AEMApriori >> incrementSupportOfCandidates: candidates forTransaction: transaction [
 	"Increment the support of all the candidates based on the given transaction"
-	
 	candidates
 		do: [ :candidate | 
 			(transaction includesAll: candidate items)
@@ -166,11 +165,8 @@ AEMApriori >> incrementSupportOfCandidatesForTransaction: transaction [
 
 { #category : #initialization }
 AEMApriori >> initialize [ 
-
-	candidates := OrderedCollection new.
-	L := OrderedCollection new.
 	minSupport := 2.
-	
+
 	"by default use AEMFrequentItemSet (#useFrequentItemSetClass), which is the classical frequent itemset for Apriori
 	The other possibility is to use the class AEMFrequentAssociation (#useFrequentAssociationClass), which is used in APIEvolMiner"
 	self useFrequentItemSetClass
@@ -205,23 +201,24 @@ AEMApriori >> minSupport: aNumber [
 { #category : #'public API' }
 AEMApriori >> run [
 	"L = frequentItemSets"
-	| k |
-	"L1 = {frequent items}"
+	| k candidats |
+	
+	"L1 = {frequent 1-itemsets}" 
+	L := OrderedCollection with: (self findItemSets1).
+	
 	k  := 1.
-	L add: self findItemSets1.
-
 	[ (L at: k) notEmpty ] whileTrue: [
 		"Ck+1 = candidates generated from Lk"
-		candidates := self candidates: (k + 1).
+		candidats := self candidates: (k + 1).
 		self transactions do: [ :transaction |
-			self incrementSupportOfCandidatesForTransaction: transaction ].
+			self incrementSupportOfCandidates: candidats forTransaction: transaction ].
 		
-		L add: self selectCandidatesAboveMinSupport.
+		L add: (self selectCandidatesAboveMinSupport: candidats).
 		k := k + 1 ]
 ]
 
 { #category : #running }
-AEMApriori >> selectCandidatesAboveMinSupport [
+AEMApriori >> selectCandidatesAboveMinSupport: candidates [
 
 	^ candidates select: [ :each | each support >= self minSupport ]
 ]
