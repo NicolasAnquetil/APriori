@@ -72,6 +72,11 @@ AEMFrequentItemSet >> associationRules [
 	^ self subsets collect: [ :subset | self associationRuleFrom: subset]
 ]
 
+{ #category : #enumerating }
+AEMFrequentItemSet >> do: aBlock [
+	^ items do: aBlock
+]
+
 { #category : #initialization }
 AEMFrequentItemSet >> initialize [
 	super initialize.

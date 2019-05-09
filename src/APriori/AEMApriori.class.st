@@ -84,13 +84,13 @@ AEMApriori class >> apriori2 [
 		run.
 ]
 
-{ #category : #queries }
-AEMApriori >> candidates: k [
+{ #category : #algorithm }
+AEMApriori >> aprioriGen: k [
 	
 	| join |
 	join := L last asSet asArray.
 
-	join := join collectWithIndex: [ :each :index | 
+	join := join withIndexCollect: [ :each :index | 
 		((index + 1) to: join size) collect: [ :index2 | 
 			((join at: index) items union: (join at: index2) items) sorted ]].
 	
@@ -98,7 +98,7 @@ AEMApriori >> candidates: k [
 	^ join collect: [ :each | self createItemSetFrom: each ].
 ]
 
-{ #category : #factory }
+{ #category : #'private - utils' }
 AEMApriori >> createItemSetFrom: aCollection [
 
 	^ self frequentClass from: aCollection with: self
@@ -106,7 +106,7 @@ AEMApriori >> createItemSetFrom: aCollection [
 
 ]
 
-{ #category : #running }
+{ #category : #algorithm }
 AEMApriori >> findItemSets1 [
 	| candidates |
 	candidates := self transactions flatCollectAsSet: #yourself.
@@ -126,18 +126,23 @@ AEMApriori >> frequentClass: anObject [
 	frequentClass := anObject
 ]
 
-{ #category : #queries }
+{ #category : #'private - utils' }
 AEMApriori >> frequentItemSetFor: array [ 
 	self flag: #todo. "It looks like the order is really important. We should check that this is true"
 	^ self frequentItemSets detect: [ :each | each items = array ] ifNone: [ #() ]
 ]
 
-{ #category : #queries }
+{ #category : #accessing }
 AEMApriori >> frequentItemSets [
 	self flag: #todo. "frequentItemSets looks like returning all the potential frequentItemSets
 	without taking the threshold into account."
 	
-	^ L flatCollect: [ :each | each ]
+	^ L ifNil: [ #() ] ifNotNil: [ L flatCollect: [ :each | each ]]
+]
+
+{ #category : #accessing }
+AEMApriori >> frequentItemSets: aCollection [
+	L := aCollection
 ]
 
 { #category : #queries }
@@ -154,7 +159,7 @@ AEMApriori >> frequentItemSetsWithSupport: aNumber [
 	^ self frequentItemSets select: [ :each | each support = aNumber ]
 ]
 
-{ #category : #running }
+{ #category : #'private - utils' }
 AEMApriori >> incrementSupportOfCandidates: candidates forTransaction: transaction [
 	"Increment the support of all the candidates based on the given transaction"
 	candidates
@@ -190,7 +195,7 @@ AEMApriori >> minSupport [
 	^ minSupport * self transactions size
 ]
 
-{ #category : #'public API' }
+{ #category : #accessing }
 AEMApriori >> minSupport: aNumber [
 	"Pay attention aNumber can be an integer of a float. 
 	an Integer is meant for absolute values and a float between [ 0 and 1[ is for percentage.
@@ -198,7 +203,7 @@ AEMApriori >> minSupport: aNumber [
 	minSupport := aNumber
 ]
 
-{ #category : #'public API' }
+{ #category : #algorithm }
 AEMApriori >> run [
 	"L = frequentItemSets"
 	| k candidats |
@@ -209,7 +214,7 @@ AEMApriori >> run [
 	k  := 1.
 	[ (L at: k) notEmpty ] whileTrue: [
 		"Ck+1 = candidates generated from Lk"
-		candidats := self candidates: (k + 1).
+		candidats := self aprioriGen: (k + 1).
 		self transactions do: [ :transaction |
 			self incrementSupportOfCandidates: candidats forTransaction: transaction ].
 		
@@ -217,7 +222,7 @@ AEMApriori >> run [
 		k := k + 1 ]
 ]
 
-{ #category : #running }
+{ #category : #'private - utils' }
 AEMApriori >> selectCandidatesAboveMinSupport: candidates [
 
 	^ candidates select: [ :each | each support >= self minSupport ]
@@ -235,7 +240,7 @@ AEMApriori >> transactions [
 	^ transactions
 ]
 
-{ #category : #'public API' }
+{ #category : #accessing }
 AEMApriori >> transactions: anObject [
 	transactions := anObject
 ]
