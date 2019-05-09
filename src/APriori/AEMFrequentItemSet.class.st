@@ -1,8 +1,8 @@
 "
-I'm the internal data structure used to represent the Apriori transaction database (list of occurrence of facts).
+I'm the internal data structure used to represent the Apriori transaction database (list of items).
 I have a backpointer to the algorithm so that I can ask more information (for example when association rules are created).
 I have a support number (representing my occurence in the transactions).
-If my support is 3 it means that among the transactions at three contain my facts. 
+If my support is 3 it means that among the transactions exactly 3 contain my items. 
 
 In this database
 (
