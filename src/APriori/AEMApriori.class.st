@@ -98,6 +98,38 @@ AEMApriori >> aprioriGen: k [
 	^ join collect: [ :each | self createItemSetFrom: each ].
 ]
 
+{ #category : #algorithm }
+AEMApriori >> aprioriGen_: k [
+	| setsK setsK_1 k_1 k_2 |
+	setsK := Set new.
+	k_1 := k-1.
+	k_2 := k-2.
+	setsK_1 := L last asArray.
+	1 to: (setsK_1 size - 1) do: [ :i |
+		(i+1) to: (setsK_1 size) do: [ :j ||itemSetI itemSetJ|
+			itemSetI := setsK_1 at: i.
+			itemSetJ := setsK_1 at: j.
+			(itemSetI first: k_2) = (itemSetJ first: k_2)
+			ifTrue: [ | itemSet |
+				itemSet := Array new: k.
+				1 to: k_2 do: [ :n | itemSet at: n put: (itemSetI at: n)].
+				(itemSetI at: k_1) < (itemSetJ at: k_1)
+				ifTrue: [
+					itemSet at: k_1 put: (itemSetI at: k_1).
+					itemSet at: k put: (itemSetJ at: k_1).
+				]
+				ifFalse:  [
+					itemSet at: k_1 put: (itemSetJ at: k_1).
+					itemSet at: k put: (itemSetI at: k_1).
+				].
+				setsK add: (AEMFrequentItemSet from: itemSet with: self).
+			]
+		]
+	].
+	^ setsK
+
+]
+
 { #category : #'private - utils' }
 AEMApriori >> createItemSetFrom: aCollection [
 
@@ -110,7 +142,7 @@ AEMApriori >> createItemSetFrom: aCollection [
 AEMApriori >> findItemSets1 [
 	| candidates |
 	candidates := self transactions flatCollectAsSet: #yourself.
-	candidates := candidates collect: [ :each | self createItemSetFrom: {each} ].
+	candidates := candidates collect: [ :each | self createItemSetFrom: { each } ].
 	self transactions
 		do: [ :transaction | self incrementSupportOfCandidates: candidates forTransaction: transaction ].
 	^ candidates := self selectCandidatesAboveMinSupport: candidates
