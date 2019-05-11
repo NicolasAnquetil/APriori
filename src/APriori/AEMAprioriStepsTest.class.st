@@ -36,21 +36,22 @@ AEMAprioriStepsTest >> setUp [
 ]
 
 { #category : #tests }
-AEMAprioriStepsTest >> testAprioriGenK2 [
+AEMAprioriStepsTest >> testAprioriGenJoin2 [
 	| L2 |
 	apriori1 frequentItemSets: (OrderedCollection with: (self asItemSets:  #(('1')  ('2') ('3')))).
-	L2 := apriori1 aprioriGen_: 2.
+	L2 := apriori1 aprioriGenJoin: 2.
 
 	self assert: L2 size equals: 3.
 	self assert: ((self ItemsSetsAsCollections: L2) includesAll: #(('1' '2')  ('2' '3') ('1' '3'))).
 
+
 ]
 
 { #category : #tests }
-AEMAprioriStepsTest >> testAprioriGenK3 [
+AEMAprioriStepsTest >> testAprioriGenJoin3 [
 	| L2 |
 	apriori1 frequentItemSets: (OrderedCollection with: (self asItemSets:  #(('1' '2') ('1' '3') ('2' '3') ('2' '4')))).
-	L2 := apriori1 aprioriGen_: 3.
+	L2 := apriori1 aprioriGenJoin: 3.
 
 	self assert: L2 size equals: 2.
 	self assert: ((self ItemsSetsAsCollections: L2) includesAll: #(('1' '2' '3') ('2' '3' '4'))).

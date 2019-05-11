@@ -99,35 +99,65 @@ AEMApriori >> aprioriGen: k [
 ]
 
 { #category : #algorithm }
-AEMApriori >> aprioriGen_: k [
-	| setsK setsK_1 k_1 k_2 |
-	setsK := Set new.
+AEMApriori >> aprioriGenJoin: k [
+	"From: Agrawal, Srikant, 'Fast Algorithms for Mining Association Rules', VLDB'94
+	In the join step, we join Lk-1 with Lk-1:
+		insert into Ck
+		select p.item1, p.item2, ..., p.itemk-1, q.itemk-1
+		from Lk-1 p,  Lk-1 q
+		where p.item1 = q.item1, ..., pitemk-2 = q.itemk-2, p.itemk-1 < q.itemk-1;"
+	| Ck Lk_1 k_1 k_2 |
+	Ck := Set new.
 	k_1 := k-1.
 	k_2 := k-2.
-	setsK_1 := L last asArray.
-	1 to: (setsK_1 size - 1) do: [ :i |
-		(i+1) to: (setsK_1 size) do: [ :j ||itemSetI itemSetJ|
-			itemSetI := setsK_1 at: i.
-			itemSetJ := setsK_1 at: j.
-			(itemSetI first: k_2) = (itemSetJ first: k_2)
-			ifTrue: [ | itemSet |
-				itemSet := Array new: k.
-				1 to: k_2 do: [ :n | itemSet at: n put: (itemSetI at: n)].
-				(itemSetI at: k_1) < (itemSetJ at: k_1)
+	Lk_1 := L last.
+	1 to: (Lk_1 size - 1) do: [ :i |
+		(i+1) to: (Lk_1 size) do: [ :j ||p q|
+			p := Lk_1 at: i.
+			q := Lk_1 at: j.
+			(p first: k_2) = (q first: k_2)
+			ifTrue: [ | candidate |
+				candidate := Array new: k.
+				1 to: k_2 do: [ :n | candidate at: n put: (p at: n)].
+				(p at: k_1) < (q at: k_1)
 				ifTrue: [
-					itemSet at: k_1 put: (itemSetI at: k_1).
-					itemSet at: k put: (itemSetJ at: k_1).
+					candidate at: k_1 put: (p at: k_1).
+					candidate at: k put: (q at: k_1).
 				]
 				ifFalse:  [
-					itemSet at: k_1 put: (itemSetJ at: k_1).
-					itemSet at: k put: (itemSetI at: k_1).
+					candidate at: k_1 put: (q at: k_1).
+					candidate at: k put: (p at: k_1).
 				].
-				setsK add: (AEMFrequentItemSet from: itemSet with: self).
+				Ck add: (AEMFrequentItemSet from: candidate with: self).
 			]
 		]
 	].
-	^ setsK
+	^ Ck
 
+]
+
+{ #category : #algorithm }
+AEMApriori >> aprioriGenPrune: Ck [
+	"From: Agrawal, Srikant, 'Fast Algorithms for Mining Association Rules', VLDB'94
+	In the prune step, we delete all itemsets c in Ck such that some (k-1)-subset of c is not in Lk-1:
+		forall itemsets c in Ck do
+			forall (k-1)-subsets s of c do
+				if (s notIn Lk-1) then
+					delete c from Ck; "
+
+
+]
+
+{ #category : #algorithm }
+AEMApriori >> aprioriGen_: k [
+	"From: Agrawal, Srikant, 'Fast Algorithms for Mining Association Rules', VLDB'94
+	The apriori-gen function takes as argument Lk-1, the set of all large (k - 1)-itemsets.
+	It returns a superset of the set of all large k-items. The function works as follows.
+	- First, in the join step, we join Lk-1 with Lk-1
+	- Next, in the prune step, we delete all itemsets c in Ck such that some (k-1)-subset of c is not in Lk-1"
+	| Ck |
+	Ck := self aprioriGenJoin: k.
+	^ self aprioriGenPrune: Ck.
 ]
 
 { #category : #'private - utils' }
