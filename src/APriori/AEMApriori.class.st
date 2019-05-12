@@ -86,7 +86,11 @@ AEMApriori class >> apriori2 [
 
 { #category : #algorithm }
 AEMApriori >> aprioriGen: k [
-	
+	"Alternative implementation of the AprioriGen function in Agrawal, Srikant, 'Fast Algorithms for Mining Association Rules', VLDB'94.
+	The apriori-gen function takes as argument Lk-1, the set of all large (k - 1)-itemsets.
+	It returns a superset of the set of all large k-items. The function works as follows.
+	- First, in the join step, we join Lk-1 with Lk-1
+	- Next, in the prune step, we delete all itemsets c in Ck such that some (k-1)-subset of c is not in Lk-1"
 	| join |
 	join := L last asSet asArray.
 
@@ -145,7 +149,8 @@ AEMApriori >> aprioriGenPrune: Ck [
 				if (s notIn Lk-1) then
 					delete c from Ck; "
 
-
+	self flag: 'I don t understand why this is needed. It seems to me that the property checked here is true by construction of the itemsets ?!?!?'.
+	^ Ck
 ]
 
 { #category : #algorithm }
@@ -267,19 +272,34 @@ AEMApriori >> minSupport: aNumber [
 
 { #category : #algorithm }
 AEMApriori >> run [
-	"L = frequentItemSets"
+	"Agrawal, Srikant, 'Fast Algorithms for Mining Association Rules', VLDB'94.
+	D is the set of transactions ; an itemset of size k is called a k-itemset ; Lk is the set of large k-itemsets
+		1) L1 = {large 1-itemsets};
+		2) for ( k=2; Lk-1 notEmpty; k++ ) do begin
+		3)		Ck = aprioriGen(Lk-1); // New candidates
+		4)		forall transactions t in D do begin
+		5)			Ct = Subset(Ck, t); // Candidates Contained in t
+		6)			forall candidates c in Ct do
+		7)				c.count++;
+		8)		end
+		9)		Lk = {C in Ck | c.count >= minsup}
+		10)end
+		11)Answer = L1 union L2 union ... Lk; "
 	| k candidats |
 	
-	"L1 = {frequent 1-itemsets}" 
+	"1)" 
 	L := OrderedCollection with: (self findItemSets1).
 	
 	k  := 1.
+	"2)"
 	[ (L at: k) notEmpty ] whileTrue: [
-		"Ck+1 = candidates generated from Lk"
+		"3)"
 		candidats := self aprioriGen: (k + 1).
+		"4) 5)"
 		self transactions do: [ :transaction |
+			"6) 7)"
 			self incrementSupportOfCandidates: candidats forTransaction: transaction ].
-		
+		"9)"
 		L add: (self selectCandidatesAboveMinSupport: candidats).
 		k := k + 1 ]
 ]
